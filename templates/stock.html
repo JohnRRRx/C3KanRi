@@ -1,0 +1,52 @@
+{% extends "index.html" %}{% block content %}
+<form method="post" action="http://127.0.0.1:5000/stock">
+  <div id="tickers" class="mb-3 position-relative">
+    <label for="stock_id" class="form-label">銘柄コード</label>
+    <input type="text" class="form-control" id="stock_id" name="stock_id" required/>
+    <ul id="suggestion-list" class="dropdown-menu position-absolute w-100"
+      style="display: none; top: 100%; max-height: 200px; overflow-y: auto; z-index: 1050;">
+    </ul>
+  </div>
+
+  <div class="mb-3">
+    <label for="stock_num" class="form-label">銘柄名</label>
+    <input type="text" class="form-control" id="found_name" name="found_name" required readonly/>
+  </div>
+
+  <div class="mb-3">
+    <label for="stock_num" class="form-label">約定株数</label>
+    <input type="number" class="form-control" id="stock_num" name="stock_num" required/>
+  </div>
+
+  <div class="mb-3">
+    <label for="stock_price" class="form-label">約定単価</label>
+    <input type="number" step="0.01" class="form-control" id="stock_price" name="stock_price" required/>
+  </div>
+
+  <div class="mb-3">
+    <label for="fee" class="form-label">手数料</label>
+    <input type="number" class="form-control" id="fee" name="fee" required/>
+  </div>
+
+  <div class="mb-3">
+    <label for="tax" class="form-label">課税額</label>
+    <input type="number" class="form-control" id="tax" name="tax" required/>
+  </div>
+
+  <div class="mb-3">
+    <label for="date_info" class="form-label">日付</label>
+    <input type="date" class="form-control" id="date_info" name="date_info" required/>
+  </div>
+
+  <button type="submit" class="btn btn-primary">追加</button>
+</form>
+
+<script src="autoComplete.js"></script>
+
+<style>
+  #suggestion-list .dropdown-item:hover {
+    background-color: #6aa3e4 !important;
+    color: white !important;
+  }
+</style>
+{% endblock %}

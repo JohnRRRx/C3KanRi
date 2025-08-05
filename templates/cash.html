@@ -1,0 +1,31 @@
+{% extends "index.html" %}{% block content %}
+<form method="post" action="http://127.0.0.1:5000/cash">
+  <div class="mb-3">
+    <label for="jp_yen" class="form-label">日本円</label>
+    <input type="number" class="form-control" id="jp_yen" name="jp_yen" />
+  </div>
+
+  <div class="mb-3">
+    <label for="us_dollars" class="form-label">米ドル</label>
+    <input
+      type="number"
+      step="0.01"
+      class="form-control"
+      id="us_dollars"
+      name="us_dollars"
+    />
+  </div>
+
+  <div class="mb-3">
+    <label for="comment" class="form-label">備考</label>
+    <input type="text" class="form-control" id="comment" name="comment" />
+  </div>
+
+  <div class="mb-3">
+    <label for="date_info" class="form-label">日付</label>
+    <input type="date" class="form-control" id="date_info" name="date_info" />
+  </div>
+
+  <button type="submit" class="btn btn-primary">追加</button>
+</form>
+{% endblock %}

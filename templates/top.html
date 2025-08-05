@@ -1,0 +1,101 @@
+
+{% extends "index.html" %}{% block content %}
+<h4>通貨一覧</h4>
+<div id="cash_info" class="table-responsive w-100">
+  <table class="cash_table text-nowrap">
+    <thead>
+      <tr>
+        <td><b>JPY総額：</b>{{data['jp_yen']}} <b>円</b></td>
+        <td class="ps-4"><b>USD総額：</b>{{data['us_dollars']}} <b>ドル</b></td>
+        <td class="ps-4"><b>本日レート：</b>:{{data['usd_to_jpy']}} </td>
+        <td class="ps-4"><b>通貨総額：</b>{{data['total']}} <b>円</b></td>
+      </tr>
+    </thead>
+  </table>
+
+  <table class="table table-bordered overflow-x-scroll">
+    <thead>
+      <tr>
+        <th scope="col">ID</th>
+        <th scope="col">日本円</th>
+        <th scope="col">米ドル</th>
+        <th scope="col">日付</th>
+        <th scope="col">備考</th>
+        <th scope="col" style="width:1%; white-space:nowrap;" class="text-center"></th>
+      </tr>
+    </thead>
+      {% for data in data['cash_result'] %}
+      <tr>
+        <td>{{data[0]}}</td>
+        <td>{{data[1]}}</td>
+        <td>{{data[2]}}</td>
+        <td>{{data[4]}}</td>
+        <td>{{data[3]}}</td>
+        <td style="width:1%; white-space:nowrap;" class="text-center">
+          <form action="/cash_delete" method="post">
+            <input type="hidden" name="id" value="{{data[0]}}" />
+            <button class="btn btn-danger btn-sm">削除</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+  </table>
+</div>
+<hr>
+
+<h4>株一覧</h4>
+<div id="stock_info" class="table-responsive w-100">
+  <table class="table table-bordered text-nowrap overflow-x-scroll">
+    <thead>
+      <tr>
+        <th scope="col">銘柄コード</th>
+        <th scope="col">銘柄名</th>
+        <th scope="col">保有株数</th>
+        <th scope="col">現在株価(円)</th>
+        <th scope="col">時価総額(円)</th>
+        <th scope="col">株式資産比率(%)</th>
+        <th scope="col">購入総額(円)</th>
+        <th scope="col">平均取得単価(円)</th>
+        <th scope="col">リターン率(%)</th>
+        <th scope="col" style="width:1%; white-space:nowrap;" class="text-center"></th>
+      </tr>
+    </thead>
+      {% for d in data["stock_info"] %} 
+       <tr>
+        <td>{{d["stock_id"]}}</td>
+        <td>{{d["found_name"]}}</td>
+        <td>{{d["shares"]}}</td>
+        <td>{{d["current_price"]}}</td>
+        <td>{{d["total_value"]}}</td>
+        <td>{{d["value_percentage"]}}</td>
+        <td>{{d["stock_cost"]}}</td>
+        <td>{{d["average_cost"]}}</td>
+        <td>{{d["rate_of_return"]}}</td>
+        <td style="width:1%; white-space:nowrap;" class="text-center">
+          <form action="/stock_delete" method="post">
+            <input type="hidden" name="id" value="{{d["stock_id"]}}" />
+            <button class="btn btn-danger btn-sm">削除</button>
+          </form>
+        </td>
+       </tr>
+      {% endfor %}
+  </table>
+</div>
+
+<hr>
+
+<div id="chart" class="d-flex flex-wrap">
+  {% if data["show_stock_piechart"] %}
+  <figure class="col-md-6 col-lg-4 mb-4">
+    <figcaption class="fw-semibold">銘柄別シェア</figcaption>
+    <img class="w-100" src="../static/stock_piechart.jpg" alt="銘柄別シェア">
+  </figure>
+  {% endif %}
+  {% if data["show_assets_piechart"] %}
+  <figure class="col-md-6 col-lg-4 mb-4">
+      <figcaption class="fw-semibold">資産別シェア</figcaption>
+      <img class="w-100" src="../static/assets_piechart.jpg" alt="資産別シェア">
+  </figure>
+  {% endif %}
+</div>
+{% endblock %}
