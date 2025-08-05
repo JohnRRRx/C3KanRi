@@ -1,11 +1,11 @@
 import math
-import os
 import sqlite3
-
-import matplotlib
-import matplotlib.pyplot as plt
 import requests
 import yfinance as yf
+import matplotlib.pyplot as plt
+import matplotlib
+import japanize_matplotlib
+import os
 from flask import Flask, g, redirect, render_template, request, url_for
 
 matplotlib.use("agg")
