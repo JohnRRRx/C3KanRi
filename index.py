@@ -1,12 +1,13 @@
 import math
+import os
 import sqlite3
+
+import matplotlib
+import matplotlib.pyplot as plt
 import requests
 import yfinance as yf
-import matplotlib.pyplot as plt
-import matplotlib
-import japanize_matplotlib
-import os
-from flask import Flask, g, redirect, render_template, url_for, request
+from flask import Flask, g, redirect, render_template, request, url_for
+
 matplotlib.use("agg")
 
 endPoint = "https://forex-api.coin.z.com/public"
@@ -14,7 +15,9 @@ path = "/v1/ticker"
 
 app = Flask(__name__)
 database = "datafile.db"
+app.config["PREFERRED_URL_SCHEME"] = "https"
 app.config["SERVER_NAME"] = "c3kanri.onrender.com"
+
 
 def get_db():
     if not hasattr(g, "sqlite_db"):
@@ -66,17 +69,18 @@ def top():
     # # 時価総額を計算
     total_stock_value = 0
 
-    #銘柄別データを計算
+    # 銘柄別データを計算
     stock_info = []
     for stock in unqiue_stock_list:
-        result = cursor.execute(
-            "select * from stock where stock_id = ?", (stock,))
+        result = cursor.execute("select * from stock where stock_id = ?", (stock,))
         result = result.fetchall()
         stock_cost = 0  # 単一株総コスト
         shares = 0  # 単一株総所持数
         for d in result:
             shares += int(d[3])  # 約定株数を累計
-            stock_cost += d[3] * d[4] + d[5] + d[6]  # 約定株数 x 約定単価 + 手数料 + 課税額
+            stock_cost += (
+                d[3] * d[4] + d[5] + d[6]
+            )  # 約定株数 x 約定単価 + 手数料 + 課税額
 
         # 現在株価を取得
         stock_code = yf.Ticker(stock)
@@ -107,8 +111,9 @@ def top():
 
     for stock in stock_info:
         stock["value_percentage"] = round(
-            stock["total_value"] * 100 / total_stock_value, 2)
-    
+            stock["total_value"] * 100 / total_stock_value, 2
+        )
+
     # 株の円グラフを作成
     if len(unqiue_stock_list) != 0:
         labels = tuple(unqiue_stock_list)
@@ -125,7 +130,7 @@ def top():
             pass
 
     # 資産全体の円グラフを作成
-    if us_dollars!=0 or jp_yen != 0 or total_stock_value != 0:
+    if us_dollars != 0 or jp_yen != 0 or total_stock_value != 0:
         labels = tuple(["米ドル", "日本円", "株"])
         size = [us_dollars * float(usd_to_jpy), jp_yen, total_stock_value]
 
@@ -147,13 +152,14 @@ def top():
             os.remove("static/assets_piechart.jpg")
         except:
             pass
-    
-    
+
     data["stock_info"] = stock_info
-    data.update({
+    data.update(
+        {
             "show_stock_piechart": os.path.exists("static/stock_piechart.jpg"),
             "show_assets_piechart": os.path.exists("static/assets_piechart.jpg"),
-        })
+        }
+    )
     return render_template("top.html", data=data)
 
 
@@ -221,9 +227,9 @@ def submit_stock():
         """insert into stock (stock_id, found_name, stock_num, stock_price, fee, tax, date_info) values (?, ?, ?, ?, ?, ?, ?)""",
         (stock_id, found_name, stock_num, stock_price, fee, tax, date),
     )
-    # print(stock_id,found_name, stock_num, stock_price, fee, tax, date) 
+    # print(stock_id,found_name, stock_num, stock_price, fee, tax, date)
     conn.commit()
-    return redirect("/") 
+    return redirect("/")
     return render_template("/")
 
 
@@ -254,11 +260,12 @@ def search_ticker():
 
         ticker_list = []
         for row in results:
-          ticker_list.append({"ticker_code": row[0], "found_name": row[1]})
+            ticker_list.append({"ticker_code": row[0], "found_name": row[1]})
         # print(ticker_list)
         return {"results": ticker_list}
     except:
         print("Error")
+
 
 @app.route("/stock_delete", methods=["POST"])
 def stock_delete():
