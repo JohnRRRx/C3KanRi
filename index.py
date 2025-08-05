@@ -14,7 +14,7 @@ path = "/v1/ticker"
 
 app = Flask(__name__)
 database = "datafile.db"
-
+app.config["SERVER_NAME"] = "c3kanri.onrender.com"
 
 def get_db():
     if not hasattr(g, "sqlite_db"):
@@ -182,7 +182,7 @@ def submit_cash():
         (jp_yen, us_dollars, comment, date),
     )
     conn.commit()
-    return redirect(url_for("top"))  # returnがないとエラーになる
+    return redirect(url_for("top", _external=True))  # returnがないとエラーになる
 
 
 @app.route("/cash_delete", methods=["POST"])
