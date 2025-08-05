@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 import japanize_matplotlib
 import os
-from flask import Flask, g, redirect, render_template, request
+from flask import Flask, g, redirect, render_template, url_for, request
 matplotlib.use("agg")
 
 endPoint = "https://forex-api.coin.z.com/public"
@@ -182,7 +182,7 @@ def submit_cash():
         (jp_yen, us_dollars, comment, date),
     )
     conn.commit()
-    return redirect("/")  # returnがないとエラーになる
+    return redirect(url_for("top"))  # returnがないとエラーになる
 
 
 @app.route("/cash_delete", methods=["POST"])
