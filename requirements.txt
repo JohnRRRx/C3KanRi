@@ -4,3 +4,4 @@ requests
 yfinance
 matplotlib
 japanize_matplotlib
+setuptools
