@@ -20,7 +20,7 @@ WebAPIとPythonの学習の一環として開発しました。
 
 |           | 技術                |
 |:---------:|:-------------------:|
-| Frontend  | JavaScript, HTML, Bootstrap, CSS |
+| Frontend  | JavaScript, HTML, CSS, Bootstrap|
 | Backend   | Python, Flask        |
 | Database  | SQLite3              |
 | Hosting   | Render               |
