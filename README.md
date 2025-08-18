@@ -10,10 +10,10 @@ WebAPIとPythonの学習の一環として開発しました。
 普段扱っている資産の種類(円、ドル、ETF)のみを対象にしております。
 
  ## 機能紹介
-| ![](https://imgpoi.com/i/AYHODE.gif) | ![](https://imgpoi.com/i/AYH33V.gif)  | 
+| ![](https://i.ibb.co/cKv3jw6Z/add-cash.gif) | ![](https://i.ibb.co/WpGfzQzM/add-stock.gif)  | 
 |:-----------:|:------------:|
 |通貨(円/ドル)を記録する機能|株を記録する機能(銘柄コードと銘柄名のAutoComplete)|
-| ![](https://imgpoi.com/i/AYHHTD.gif) | ![](https://imgpoi.com/i/AYHUZ2.gif) | 
+| ![](https://i.ibb.co/ycGVS222/toppage.gif) | ![](https://i.ibb.co/Vpt1kYSD/delete.gif) | 
 |一覧表示機能(通貨、株、割合グラフ)|記録を削除する機能|
   
  ## 使用技術	
