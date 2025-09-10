@@ -6,7 +6,8 @@ import matplotlib.pyplot as plt
 import matplotlib
 import japanize_matplotlib
 import os
-from flask import Flask, g, redirect, render_template, request, url_for
+import uuid
+from flask import Flask, g, redirect, render_template, request, session
 
 matplotlib.use("agg")
 
@@ -14,7 +15,9 @@ endPoint = "https://forex-api.coin.z.com/public"
 path = "/v1/ticker"
 
 app = Flask(__name__)
+app.config["SECRET_KEY"] = os.urandom(24)
 database = "datafile.db"
+
 
 def get_db():
     if not hasattr(g, "sqlite_db"):
@@ -27,19 +30,26 @@ def close_db(exception):
         g.sqlite_db.close()
 
 
+@app.before_request
+def assign_user_id():
+    if "user_id" not in session:
+        session["user_id"] = str(uuid.uuid4())
+
+
 @app.route("/")
 def top():
+    user_id = session["user_id"]
     conn = get_db()
     cursor = conn.cursor()
-    result = cursor.execute("select * from cash")
+    result = cursor.execute("select * from cash where user_id = ?", (user_id,))
     cash_result = result.fetchall()
 
     # 円とドルの総額を計算
     jp_yen = 0
     us_dollars = 0
     for data in cash_result:
-        jp_yen += data[1]
-        us_dollars += data[2]
+        jp_yen += data[2]
+        us_dollars += data[3]
 
     # 為替レートを取得
     response = requests.get(endPoint + path)
@@ -57,26 +67,28 @@ def top():
         "cash_result": cash_result,
     }
     # 株データを取得
-    result2 = cursor.execute("select * from stock")
+    result2 = cursor.execute("select * from stock where user_id = ?", (user_id,))
     stock_result = result2.fetchall()
     unqiue_stock_list = []
     for data2 in stock_result:
-        if data2[1] not in unqiue_stock_list:
-            unqiue_stock_list.append(data2[1])
+        if data2[2] not in unqiue_stock_list:
+            unqiue_stock_list.append(data2[2])
     # # 時価総額を計算
     total_stock_value = 0
 
     # 銘柄別データを計算
     stock_info = []
     for stock in unqiue_stock_list:
-        result = cursor.execute("select * from stock where stock_id = ?", (stock,))
+        result = cursor.execute(
+            "select * from stock where stock_id = ? and user_id = ?", (stock, user_id)
+        )
         result = result.fetchall()
         stock_cost = 0  # 単一株総コスト
         shares = 0  # 単一株総所持数
         for d in result:
-            shares += int(d[3])  # 約定株数を累計
+            shares += int(d[4])  # 約定株数を累計
             stock_cost += (
-                d[3] * d[4] + d[5] + d[6]
+                d[4] * d[5] + d[6] + d[7]
             )  # 約定株数 x 約定単価 + 手数料 + 課税額
 
         # 現在株価を取得
@@ -96,7 +108,7 @@ def top():
         stock_info.append(
             {
                 "stock_id": stock,
-                "found_name": d[2],
+                "found_name": d[3],
                 "stock_cost": stock_cost,
                 "total_value": total_value,
                 "average_cost": average_cost,
@@ -178,11 +190,12 @@ def submit_cash():
     date = request.values["date_info"]
 
     # dbに更新
+    user_id = session["user_id"]
     conn = get_db()
     cursor = conn.cursor()
     cursor.execute(
-        """insert into cash (jp_yen, us_dollars, comment, date_info) values (?, ?, ?, ?)""",
-        (jp_yen, us_dollars, comment, date),
+        """insert into cash (user_id, jp_yen, us_dollars, comment, date_info) values (?, ?, ?, ?, ?)""",
+        (user_id, jp_yen, us_dollars, comment, date),
     )
     conn.commit()
     return redirect("/")  # returnがないとエラーになる
@@ -190,10 +203,14 @@ def submit_cash():
 
 @app.route("/cash_delete", methods=["POST"])
 def cash_delete():
+    user_id = session["user_id"]
     transaction_id = request.values["id"]
     conn = get_db()
     cursor = conn.cursor()
-    cursor.execute("delete from cash where transaction_id = ?", (transaction_id,))
+    cursor.execute(
+        "delete from cash where transaction_id = ? and user_id = ?",
+        (transaction_id, user_id),
+    )
     conn.commit()
     return redirect("/")
 
@@ -218,11 +235,12 @@ def submit_stock():
         tax = request.values["tax"]
     date = request.values["date_info"]
 
+    user_id = session["user_id"]
     conn = get_db()
     cursor = conn.cursor()
     cursor.execute(
-        """insert into stock (stock_id, found_name, stock_num, stock_price, fee, tax, date_info) values (?, ?, ?, ?, ?, ?, ?)""",
-        (stock_id, found_name, stock_num, stock_price, fee, tax, date),
+        """insert into stock (user_id, stock_id, found_name, stock_num, stock_price, fee, tax, date_info) values (?, ?, ?, ?, ?, ?, ?, ?)""",
+        (user_id, stock_id, found_name, stock_num, stock_price, fee, tax, date),
     )
     # print(stock_id,found_name, stock_num, stock_price, fee, tax, date)
     conn.commit()
@@ -266,10 +284,13 @@ def search_ticker():
 
 @app.route("/stock_delete", methods=["POST"])
 def stock_delete():
+    user_id = session["user_id"]
     stock_id = request.values["id"]
     conn = get_db()
     cursor = conn.cursor()
-    cursor.execute("delete from stock where stock_id = ?", (stock_id,))
+    cursor.execute(
+        "delete from stock where stock_id = ? and user_id = ?", (stock_id, user_id)
+    )
     conn.commit()
     return redirect("/")
 

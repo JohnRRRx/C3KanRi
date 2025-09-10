@@ -27,10 +27,10 @@
       {% for data in data['cash_result'] %}
       <tr>
         <td>{{data[0]}}</td>
-        <td>{{data[1]}}</td>
         <td>{{data[2]}}</td>
-        <td>{{data[4]}}</td>
         <td>{{data[3]}}</td>
+        <td>{{data[5]}}</td>
+        <td>{{data[4]}}</td>
         <td style="width:1%; white-space:nowrap;" class="text-center">
           <form action="/cash_delete" method="post">
             <input type="hidden" name="id" value="{{data[0]}}" />
