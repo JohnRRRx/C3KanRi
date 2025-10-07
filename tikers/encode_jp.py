@@ -7,13 +7,9 @@ df = pd.read_excel("./tikers/jp.xls", usecols=["コード", "銘柄名", "市場
 # # 項目名を変更
 df.columns = ["ticker", "foundname", "market"]
 
-# tickerの値を判断する関数作成
-def ticker_check(row):
-    ticker = str(row["ticker"]) + ".T"
-    return str(ticker)
-
-# # 各行のticker欄に、↑の関数で処理
-df["ticker"] = df.apply(ticker_check, axis=1)
+# tickerにある全データを文字列に変換し、文字列を1個ずつ小数点があった場合は区切って
+# 最初の4文字を.Tと結合 (ifで1個ずつ判定するより効率的+)
+df["ticker"] = df["ticker"].astype(str).str.split(".").str[0] + ".T"
 
 data_to_insert = list(zip(df["ticker"], df["foundname"], df["market"]))
 
